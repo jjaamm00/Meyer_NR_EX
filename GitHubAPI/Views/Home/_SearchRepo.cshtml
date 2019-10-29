@@ -1,0 +1,45 @@
+﻿
+@{
+    ViewBag.Title = "_SearchRepo";
+}
+
+@*<div class="row mt-2">
+    <div class="col-12">
+        <div class="input-group mb-3">
+            <input type="text" class="form-control" id="txtUser" placeholder="Search Reposity" aria-label="Search Reposity" aria-describedby="button-addon2">
+            <div class="input-group-append">
+                <button class="btn btn-success btn-sm" type="button" id="btnSearchUser"><i class="fa fa-search"></i></button>
+            </div>
+        </div>
+    </div>
+</div>*@
+<div class="card text-white bg-dark mb-3">
+    <div class="card-body">
+        <p><strong><i class="fa fa-user"></i> User : </strong><label class="badge badge-warning" id="lbUser" style="font-size: 22px;"></label></p>
+        <div class="input-group mb-3">
+            <input type="text" class="form-control" id="txtRepo" placeholder="Search Reposity" aria-label="Search Reposity" aria-describedby="button-addon2">
+            <div class="input-group-append">
+                <button class="btn btn-success btn-sm" type="button" id="btnSearchRepo"><i class="fa fa-search"></i></button>
+            </div>
+        </div>
+        <hr />
+        <div class="row">
+            <div class="col-12">
+                <p class="text-right">Total Result : <label id="lblCountSearchRepo"></label></p>
+            </div>
+            <div class="col-12">
+                <table class="table table-sm" id="tbRepo">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th scope="col" style="width: 40%;">Reposity</th>
+                            <th scope="col" style="width: 20%;">Language</th>
+                            <th scope="col" class="text-center"><i class="fa fa-cog"></i></th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>

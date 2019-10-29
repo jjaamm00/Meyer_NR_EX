@@ -1,0 +1,147 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+
+<style>
+    .jumbotron {
+        background: none;
+        border: 2px solid #f7f7f9;
+    }
+</style>
+
+<script>
+    $(function () {
+        $("#txtUser").focusin(function () {
+            $("#txtSearchRepoOnly").val("");
+        });
+
+        $("#txtSearchRepoOnly").focusin(function () {
+            $("#txtUser").val("");
+        });
+
+        $("#btnSearchUser").click(function () {
+            $("#divRepo").load("@Url.Action("_SearchUser", "Home")", function () {
+                $.ajax({
+                    url: "@Url.Action("GetUser", "Home")",
+                    type: "POST",
+                    async: false,
+                    data: { user_filter: $("#txtUser").val() },
+                    success: function (response) {
+                        $("#lblCountSearchUser").text(response.TotalCount.toLocaleString());
+                        if (response.TotalCount > 0) {
+                            str = '';
+                            for (i = 0; i < response.Items.length; i++) {
+                                str += '<li class="list-group-item">' + response.Items[i].Login + '</li>';
+                            }
+                            $("#liUser").html(str);
+                        }
+                    }
+                });
+            });
+        });
+
+        $("#btnSearchRepoOnly").click(function () {
+            $("#divRepo").load("@Url.Action("_SearchRepoOnly", "Home")", function () {
+                $.ajax({
+                    url: "@Url.Action("GetRepoOnly", "Home")",
+                    type: "POST",
+                    async: false,
+                    data: { search_crit: $("#txtSearchRepoOnly").val() },
+                    success: function (response) {
+                        $("#lblCountSearchUser").text(response.TotalCount.toLocaleString());
+                        $("#lblCountSearchRepoOnly").text(response.TotalCount.toLocaleString());
+                        str = '';
+                        if (response.TotalCount > 0) {
+                            for (i = 0; i < response.Items.length; i++) {
+                                var sp_name = response.Items[i].FullName.split('/');
+                                str += '<tr><td class="text-left" data-git-url="' + response.Items[i].CloneUrl + '" data-git-ssh-url="' + response.Items[i].SshUrl + '">' + sp_name[1] + '</td><td>' + sp_name[0] + '</td><td>' + response.Items[i].Language + '</td><td class="text-center"><button class="btn btn-sm btn-info btnCopyRepo">Copy Repository</button>&nbsp;<button class="btn btn-sm btn-secondary btnCopyRepoSSH">Copy Repository SSH</button></td></tr>';
+                            }
+                        } else {
+                            str = '<tr><td>No exist repository</td></tr>';
+                        }
+                        $("#tbRepoOnly tbody").html(str);
+                    }
+                });
+            });
+        });
+
+        $(document).on("click", "#liUser li", function () {
+            var $this = $(this);
+            $("#liUser li.active").removeClass("active");
+
+            $(this).addClass("active");
+            $("#divSerchRepo").load("@Url.Action("_SearchRepo", "Home")", function () {
+                $("#lbUser").text($this.text());
+            });
+        });
+
+        $(document).on("click", "#btnSearchRepo", function () {
+            $.ajax({
+                url: "@Url.Action("GetRepo", "Home")",
+                type: "POST",
+                async: false,
+                data: { user_filter: $("#liUser li.active").text(), search_crit: $("#txtRepo").val() },
+                success: function (response) {
+                    $("#lblCountSearchRepo").text(response.TotalCount.toLocaleString());
+                    str = '';
+                    if (response.TotalCount > 0) {
+                        for (i = 0; i < response.Items.length; i++) {
+                            str += '<tr><td class="text-left" data-git-url="' + response.Items[i].CloneUrl + '" data-git-ssh-url="' + response.Items[i].SshUrl + '">' + response.Items[i].Name + '</td><td>' + response.Items[i].Language + '</td><td class="text-center"><button class="btn btn-sm btn-info btnCopyRepo m-1">Copy Repository</button>&nbsp;<button class="btn btn-sm btn-secondary btnCopyRepoSSH">Copy Repository SSH</button></td></tr>';
+                        }
+                    } else {
+                        str = '<tr><td>No exist repository</td></tr>';
+                    }
+                    $("#tbRepo tbody").html(str);
+                }
+            });
+        });
+
+        $(document).on("click", ".btnCopyRepo", function () {
+            copyToClipboard($(this).parents("tr").children(":eq(0)"), "data-git-url");
+        });
+
+        $(document).on("click", ".btnCopyRepoSSH", function () {
+            copyToClipboard($(this).parents("tr").children(":eq(0)"), "data-git-ssh-url");
+        });
+    });
+
+    function copyToClipboard(element, dataAtt) {
+        var $temp = $("<input>");
+        $("body").append($temp);
+        //$temp.val($(element).text()).select();
+        $temp.val($(element).attr(dataAtt)).select();
+        document.execCommand("copy");
+        $temp.remove();
+    }
+</script>
+
+<div class="jumbotron">
+    <h1>Github API</h1>
+    <div class="row">
+        <div class="col-12">
+            <div class="input-group mb-3">
+                <input type="text" class="form-control" id="txtUser" placeholder="Search User" aria-label="Search User" aria-describedby="button-addon2">
+                <div class="input-group-append">
+                    <button class="btn btn-primary btn-sm" type="button" id="btnSearchUser"><i class="fa fa-search"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12">
+            <div class="input-group mb-3">
+                <input type="text" class="form-control" id="txtSearchRepoOnly" placeholder="Search Repository" aria-label="Search Repository" aria-describedby="button-addon2">
+                <div class="input-group-append">
+                    <button class="btn btn-primary btn-sm" type="button" id="btnSearchRepoOnly"><i class="fa fa-search"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12">
+            <p class="text-right">Total Result : <label id="lblCountSearchUser"></label></p>
+        </div>
+    </div>
+</div>
+
+
+<div class="mt-2" id="divRepo">
+</div>
